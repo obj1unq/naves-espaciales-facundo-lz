@@ -1,21 +1,64 @@
-class NaveDeCarga {
-
+class Nave{
 	var velocidad = 0
+
+	method velocidad(){
+		return velocidad
+	}
+
+	method prepararseParaViajar(){
+		self.aumentarVelocidadEn(15000)
+	}
+
+	method propulsar(){
+		self.aumentarVelocidadEn(20000)
+	}
+
+	method aumentarVelocidadEn(velocidadAAumentar){
+		velocidad = 300000.min(velocidad + velocidadAAumentar)
+	}
+
+	method recibirAmenaza(){}
+
+	method encontrarEnemigo(){
+		self.recibirAmenaza()
+		self.propulsar()
+	}
+}
+
+class NaveDeCarga inherits Nave{
 	var property carga = 0
 
 	method sobrecargada() = carga > 100000
 
 	method excedidaDeVelocidad() = velocidad > 100000
 
-	method recibirAmenaza() {
+	override method recibirAmenaza() {
 		carga = 0
 	}
-
 }
 
-class NaveDePasajeros {
+class NaveDeCargaRadioactiva inherits NaveDeCarga{
+	var sellado
 
-	var velocidad = 0
+	method sellado(){
+		return sellado
+	}
+
+	method sellar(){
+		sellado = true
+	}
+
+	override method prepararseParaViajar(){
+		sellado = true
+		velocidad = 300000.min(velocidad + 15000)
+	}
+
+	override method recibirAmenaza(){
+		velocidad = 0
+	}
+}
+
+class NaveDePasajeros inherits Nave{
 	var property alarma = false
 	const cantidadDePasajeros = 0
 
@@ -25,16 +68,18 @@ class NaveDePasajeros {
 
 	method estaEnPeligro() = velocidad > self.velocidadMaximaLegal() or alarma
 
-	method recibirAmenaza() {
+	override method recibirAmenaza() {
 		alarma = true
 	}
-
 }
 
-class NaveDeCombate {
-	var property velocidad = 0
+class NaveDeCombate inherits Nave{
 	var property modo = reposo
 	const property mensajesEmitidos = []
+
+	method velocidad(_velocidad){
+		velocidad = _velocidad
+	}
 
 	method emitirMensaje(mensaje) {
 		mensajesEmitidos.add(mensaje)
@@ -44,10 +89,14 @@ class NaveDeCombate {
 
 	method estaInvisible() = velocidad < 10000 and modo.invisible()
 
-	method recibirAmenaza() {
+	override method recibirAmenaza() {
 		modo.recibirAmenaza(self)
 	}
 
+	override method prepararseParaViajar(){
+		super()
+		modo.prepararseParaViajar(self)
+	}
 }
 
 object reposo {
@@ -58,6 +107,9 @@ object reposo {
 		nave.emitirMensaje("¡RETIRADA!")
 	}
 
+	method prepararseParaViajar(nave){
+		nave.emitirMensaje("Saliendo en misión")
+	}
 }
 
 object ataque {
@@ -68,4 +120,7 @@ object ataque {
 		nave.emitirMensaje("Enemigo encontrado")
 	}
 
+	method prepararseParaViajar(nave){
+		nave.emitirMensaje("Volviendo a la base")
+	}
 }

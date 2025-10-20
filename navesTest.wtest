@@ -26,6 +26,27 @@ describe "Nave de carga" {
 		assert.equals(0, naveVacia.carga())
 	}
 
+	test "propulsar"{
+		naveVacia.propulsar()
+		assert.equals(20000, naveVacia.velocidad())
+	}
+}
+
+describe "Nave de carga radioactiva" {
+	const naveConCargaSellada = new NaveDeCargaRadioactiva(carga = 5000, velocidad = 10000, sellado = true)
+	const naveSinSellar = new NaveDeCargaRadioactiva(carga = 5000, velocidad = 0, sellado = false)
+
+	test "transporte"{
+		naveConCargaSellada.recibirAmenaza()
+		assert.equals(0, naveConCargaSellada.velocidad())
+		assert.equals(5000, naveConCargaSellada.carga())
+	}
+
+	test "preparse para viajar"{
+		naveSinSellar.prepararseParaViajar()
+		assert.equals(15000, naveSinSellar.velocidad())
+		assert.that(naveSinSellar.sellado())
+	}
 }
 
 describe "Nave de pasajeros" {
@@ -54,10 +75,24 @@ describe "Nave de pasajeros" {
 		assert.that(naveSinPasajeros.alarma())
 	}
 
+	test "propulsar"{
+		naveConPasajeros.propulsar()
+		assert.equals(300000, naveConPasajeros.velocidad())
+	}
+
+	test "prepararse para viajar"{
+		naveConPasajeros.prepararseParaViajar()
+		assert.equals(300000, naveConPasajeros.velocidad())
+	}
+
+	test "encontrar enemigo"{
+		naveSinPasajeros.encontrarEnemigo()
+		assert.equals(20000, naveSinPasajeros.velocidad())
+		assert.that(naveSinPasajeros.alarma())
+	}
 }
 
 describe "Nave de combate" {
-
 	const naveEnReposo = new NaveDeCombate()
 	const naveEnAtaque = new NaveDeCombate(modo = ataque)
 
@@ -82,5 +117,17 @@ describe "Nave de combate" {
 	test "recibir amenaza en ataque" {
 		naveEnAtaque.recibirAmenaza()
 		assert.equals("Enemigo encontrado", naveEnAtaque.ultimoMensaje())
+	}
+
+	test "prepararse para viajar en reposo"{
+		naveEnReposo.prepararseParaViajar()
+		assert.equals(15000, naveEnReposo.velocidad())
+		assert.equals("Saliendo en misión", naveEnReposo.ultimoMensaje())
+	}
+
+	test "prepararse para viajar en ataque"{
+		naveEnAtaque.prepararseParaViajar()
+		assert.equals(15000, naveEnAtaque.velocidad())
+		assert.equals("Volviendo a la base", naveEnAtaque.ultimoMensaje())
 	}
 }
